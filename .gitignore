@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 #personal files
-cache/*
+*/cache/*
+cache/
+Cusco/cache/
