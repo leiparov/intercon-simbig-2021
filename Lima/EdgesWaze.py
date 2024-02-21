@@ -17,7 +17,7 @@ from multiprocessing import Pool, cpu_count
 
 ######### Logger Inicio
 timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-log_filename = f"logs/LimaEdgesWaze1400_{timestamp}.log"
+log_filename = f"logs/SanBorjaEdgesWaze1000_{timestamp}.log"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -39,8 +39,8 @@ logger.addHandler(consoleHandler)
 logger.info(f"EdgesWaze Process Started at {datetime.datetime.now()}")
 
 logger.info("Loading NODES file")
-nodesfile = "data/GrafoLima_nodes.csv"
-edgesfile = "data/GrafoLima_edges.csv"
+nodesfile = "data/GrafoSanBorja_nodes.csv"
+edgesfile = "data/GrafoSanBorja_edges.csv"
 
 nodes = pd.read_csv(nodesfile, index_col=[0])
 nodes['geometry'] = nodes['geometry'].apply(wkt.loads)
@@ -60,7 +60,7 @@ def getTimeDelta ():
     return: minutes
     """
     now = datetime.datetime.now()
-    target_time = datetime.datetime(2023, 8, 7, 14, 0, 0, 0) #Lunes 07/08 a las 08:00
+    target_time = datetime.datetime(2023, 8, 7, 10, 0, 0, 0) #Lunes 07/08 a las 08:00
     time_diff =  target_time - now
     minutes = int(time_diff.total_seconds()/60)
     return minutes, time_diff
@@ -99,7 +99,7 @@ def getWazeRouteInfo(node_a, node_b):
 
 def process_row(row):
     result = getWazeRouteInfo(row.u, row.v)
-    with open('LimaEdgesWaze1400_Recupero04.txt', 'a') as f:
+    with open('SanBorjaEdgesWaze1000_Recupero01.txt', 'a') as f:
         linea = f"{row.name};{row.u};{row.v};{result}\n"
         f.write(linea)
     return result
@@ -112,11 +112,11 @@ def apply_chunk(chunk):
     return chunk.apply(process_row, axis=1)
 
 ########## Recupero Inicio ##########
-edgeswaze = pd.read_csv('LimaEdgesWaze1400_Final.txt', sep=';', index_col=0,names=['u','v','wazeinfo'])
-print(edgeswaze.shape)
-recupero_index = edgeswaze[edgeswaze['wazeinfo'] == '(-1, -1)'].index
-logger.info("Recupero de Edges")
-logger.info(len(recupero_index))
+# edgeswaze = pd.read_csv('LimaEdgesWaze1400_Final.txt', sep=';', index_col=0,names=['u','v','wazeinfo'])
+# print(edgeswaze.shape)
+# recupero_index = edgeswaze[edgeswaze['wazeinfo'] == '(-1, -1)'].index
+# logger.info("Recupero de Edges")
+# logger.info(len(recupero_index))
 ########## Recupero Fin ##########
 
 
@@ -124,8 +124,8 @@ logger.info(len(recupero_index))
 # Define the chunk size based on your dataset size and available resources
 chunk_size = 1000
 edges2 = edges.reset_index()
-# inputdf = edges2
-inputdf = edges2.iloc[recupero_index, :]
+inputdf = edges2
+# inputdf = edges2.iloc[recupero_index, :]
 
 data_chunks = split_dataframe(inputdf, chunk_size)
 
